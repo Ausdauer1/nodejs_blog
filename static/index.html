@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+    <!-- Webpage Title -->
+    <title>항해 게시판</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+
+    <!-- Google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dongle&display=swap" rel="stylesheet">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+
+    <style>
+        .hero {
+            margin-bottom: 50px;
+        }
+        .hero-body {
+        text-align: center;
+      }
+      .table {
+          width:800px;
+          margin:auto;
+      }
+    </style>
+    <script>
+        $(document).ready(function() {
+            showarticles();
+        });
+        
+        function showarticles() {
+                $.ajax({
+                    type: "GET",
+                    url: "/api/articles",
+                    data: {},
+                    success: function (response) {
+                        let articles = response['articles']
+                        articles.sort((a, b) => Number(b.id) - Number(a.id))
+                        for (let i = 0; i < articles.length; i++) {
+                            let title = articles[i]['title']
+                            let name = articles[i]['name']
+                            let time = articles[i]['date']
+                            let articleId = articles[i]['id']
+
+                            let temp_html = `<tr onclick="location.href='/detail.html?articleId=${articleId}'" style="cursor:pointer">
+                                                <td>${title}</td>
+                                                <td>${name}</td>
+                                                <td>${time}</td>
+                                             </tr> `
+                            $('#articles-box').append(temp_html)
+                        }
+                    }
+                })
+            }
+    </script>
+
+</head>
+<body>
+    <section class="hero is-info">
+        <div class="hero-body">
+          <p class="title">
+            5기 A반 게시판
+          </p>
+          <p class="subtitle">
+            홍 매니저님의 아이들
+          </p>
+          <button onclick="location.href='/post.html'" style="height:50px; display: block; margin: auto;">게시물 작성하기</button>
+        </div>
+      </section>
+      
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">제목</th>
+        <th scope="col">작성자</th>
+        <th scope="col">작성/수정 날짜</th>
+    </tr>
+    </thead>
+    <tbody id="articles-box">
+
+    </tbody>
+</table>
+</body>
+</html>

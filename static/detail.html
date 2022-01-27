@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+    <!-- Webpage Title -->
+    <title>항해 게시판</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+
+    <!-- Google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dongle&display=swap" rel="stylesheet">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+
+<style>
+    .card{
+        width: 70%;
+        margin: 80px auto auto auto;
+        
+    }
+    .card-content {
+      text-align: center;
+    }
+      
+    .hero-body {
+    text-align: center;
+  }
+</style>
+    <script>
+      $(document).ready(function() {
+        
+        showdetail();
+        });
+
+        
+        function showdetail() {
+          const para = document.location.href.split("=")[1]
+          console.log(para)
+                $.ajax({
+                    type: "GET",
+                    url: "/api/articles/"+para,
+                    data: {},
+                    success: function (response) {
+                        let article = response['articles']
+                      
+                            let title = article['title']
+                            let name = article['name']
+                            let time = article['date']
+                            let comment = article['comment']
+
+                
+                            $('#title').append("제목 : "+title)
+                            $('#comment').append("내용 : "+comment)
+                            $('#name').append("작성자 : "+name)
+                            $('#time').append("작성/수정 시간 : "+time)
+                        }
+                    })
+                }
+            
+        function modify() {
+          const para = document.location.href.split("=")[1]
+          location.href='/modify.html?articleId='+para
+        }
+    </script>
+
+</head>
+<body>
+    <section class="hero is-info">
+        <div class="hero-body">
+          <p class="title">
+            게시물 상세보기
+          </p>
+          <p class="subtitle">
+            우리 매니저님은 홍~홍~홍~
+          </p>
+          <button onclick="location.href='/index.html'" style="height:50px; display: block; margin: auto;">뒤로가기</button>
+        </div>
+      </section>
+    <div class="card">
+        <div class="card-content">
+          <p class="title" id="title">
+           
+          </p>
+            <p class="text" style="font-size: 30px;" id="comment">
+            
+          </p>
+          <p class="name" style="font-size: 20px; margin-top: 20px;"  id="name">
+            
+            </p>
+            <br>
+            <p class="uploadtime" style="color:blueviolet; font-weight: bold;" id="time">
+              
+              </p>
+              <br>
+              <button onclick="modify()" style="width: 120px; height:50px">게시글 수정</button>
+        </div>
+        </div>
+</body>
+</html>

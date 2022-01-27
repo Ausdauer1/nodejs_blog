@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+    <!-- Webpage Title -->
+    <title>항해 게시판</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+
+    <!-- Google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dongle&display=swap" rel="stylesheet">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+
+<style>
+      .hero-body {
+        text-align: center;
+      }
+
+      .posting {
+          margin: 40px auto auto auto;
+          width: 500px;
+          
+      }
+      
+</style>
+<script>
+     $(document).ready(function() {
+        
+        showdetail();
+        });
+
+    function showdetail() {
+          const para = document.location.href.split("=")[1]
+          
+                $.ajax({
+                    type: "GET",
+                    url: "/api/articles/"+para,
+                    data: {},
+                    success: function (response) {
+                        let article = response['articles']
+                      
+                            let title = article['title']
+                            let name = article['name']
+                            let comment = article['comment']
+
+                
+                            $('#title').val(title)
+                            $('#comment').val(comment)
+                            $('#name').val(name)
+                        }
+                    })
+                }
+
+
+    function modifyPost() {
+      if (($('#name').val() != "") && ($('#password').val() != "") &&
+            ($('#title').val() != "") && ($('#comment').val() != "")) {
+            let tempDate = new Date()
+            const para = document.location.href.split("=")[1]
+            
+            $.ajax({
+                type: "PUT",
+                url: '/api/articles/'+para+'/update',
+                data: {
+                    name: $('#name').val(),
+                    password: $('#password').val(),
+                    title: $('#title').val(),
+                    comment: $('#comment').val(),
+                    date: tempDate.getFullYear() + '.' + (tempDate.getMonth() + 1) + '.' + tempDate.getDate()
+                        + ' ' + tempDate.getHours() + ':' + tempDate.getMinutes() + ':' + tempDate.getSeconds()
+            
+                },
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        alert("수정되었습니다.");
+                        window.location.href = "/index.html"
+                    } else {
+                        alert("비밀번호가 틀렸습니다!")
+                    }
+                }
+              });
+        } else {
+            alert("입력칸을 모두 채워주세요.");
+        }
+    }
+
+    function deletePost() {
+        const para = document.location.href.split("=")[1]
+        const postpassword = $('#password').val()
+        $.ajax({
+                    type:"DELETE",
+                    url:'/api/articles/'+para+'/delete',
+                    data: { password: postpassword},
+                    success: function (response) {
+                        if (response["result"] == "success") {
+                        alert("삭제되었습니다.");
+                        window.location.href = "/index.html"
+                    } else {
+                        alert("비밀번호가 틀렸습니다!")
+                    }
+                      
+                    }
+              })
+    }
+</script>
+</head>
+<body>
+    <section class="hero is-info">
+        <div class="hero-body">
+          <p class="title">
+            5기 a반 게시물 수정 / 삭제
+          </p>
+          <p class="subtitle">
+            꼭 이렇게 다 바꿔야만 속이 시원했냐~~!!
+          </p>
+        </div>
+      </section>
+
+    <div class="posting">   
+    <div class="field">
+        <label class="label">제목</label>
+        <div class="control">
+          <input id="title" class="input" type="text" value="">
+        </div>
+      </div>
+      
+      <div class="field">
+        <label class="label">이름</label>
+        <div class="control">
+          <input id="name" class="input" type="text" value="">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">비밀번호</label>
+        <div class="control">
+          <input id="password" class="input" type="text" value="">
+        </div>
+      </div>
+      
+      <div class="field">
+        <label class="label">내용</label>
+        <div class="control">
+          <textarea id="comment" class="textarea" value=""></textarea>
+        </div>
+      </div>
+      
+      <div class="field is-grouped">
+        <div class="control">
+          <button onclick='modifyPost()' class="button is-link">수정 완료</button>
+        </div>
+        <div class="control">
+            <button onclick="deletePost()" class="button is-info">게시물 삭제</button>
+          </div>
+      <div class="control">
+        <button onclick="location.href ='/index.html'" class="button is-link is-light">취소</button>
+      </div>
+    </div>
+</body>
+</html>
