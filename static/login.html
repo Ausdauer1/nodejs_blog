@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+    <!-- Webpage Title -->
+    <title>항해 게시판</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+
+    <!-- Google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dongle&display=swap" rel="stylesheet">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+
+<style>
+      .hero-body {
+        text-align: center;
+      }
+
+      .posting {
+          margin: 40px auto auto auto;
+          width: 500px;
+          
+      }
+      
+</style>
+<script>
+    function sign_in() {
+        let nickname = $("#nickname").val();
+        let password = $("#password").val();
+        $.ajax({
+          type: "POST",
+          url: "/api/auth",
+          data: {
+            nickname: nickname,
+            password: password,
+          },
+          success: function (response) {
+            localStorage.setItem("token", response.token);
+            window.location.replace("/index.html");
+          },
+          error: function (error) {
+            customAlert(error.responseJSON.errorMessage);
+          },
+        });
+      }
+</script>    
+
+</head>
+<body>
+    <section class="hero is-info">
+        <div class="hero-body">
+          <p class="title">
+            5기 a반 로그인
+          </p>
+          <p class="subtitle">
+            비밀번호는486~
+          </p>
+        </div>
+      </section>
+
+    <div class="posting">   
+    <div class="field">
+        <label class="label">닉네임</label>
+        <div class="control">
+          <input id="nickname" class="input" type="text" placeholder="닉네임을 입력하세요">
+        </div>
+      </div>
+      
+      <div class="field">
+        <label class="label">비밀번호</label>
+        <div class="control">
+            <input id="password" class="input" type="password" placeholder="비밀번호를 입력하세요">
+        </div>
+      </div>
+
+      <div class="field is-grouped">
+        <div class="control">
+          <button onclick='sign_in()' class="button is-link">로그인</button>
+        </div>
+        <div class="control">
+          <button onclick="location.href ='/sign.html'" class="button is-info">회원가입 </button>
+        </div>
+        <div class="control">
+          <button onclick="location.href ='/index.html'" class="button is-info is-light">취소 </button>
+        </div>
+      </div>
+    </div>
+</body>
+</html>

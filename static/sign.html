@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+    <!-- Webpage Title -->
+    <title>항해 게시판</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+
+    <!-- Google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dongle&display=swap" rel="stylesheet">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+
+<style>
+      .hero-body {
+        text-align: center;
+      }
+
+      .posting {
+          margin: 40px auto auto auto;
+          width: 500px;
+          
+      }
+      
+</style>
+<script>
+
+    function signin() {
+        let nicknameForm = /^[A-Za-z0-9+]{3,}$/;
+        let nick = $('#nickname').val()
+        let pass = $('#password1').val()
+
+      if (($('#nickname').val() == "") || ($('#password1').val() == "") || ($('#password2').val() == "") ) {
+        alert("입력칸을 모두 채워주세요.");
+      } else if (!nicknameForm.test(document.getElementById('nickname').value)) {
+        alert("닉네임이 형식에 맞지 않습니다 <최소 3자 이상, 알파벳 대소문자(a~z, A~Z), 숫자(0~9)>")
+      } else if ((pass.length < 4) || pass.includes(nick)) {
+        alert("비밀번호가 형식에 맞지 않습니다 <최소 4자 이상, 아이디값 포함 X>") 
+      } else if ($('#password1').val() !== $('#password2').val()) {
+        alert("비밀번호가 같지 않습니다.")
+      }  else      {
+            
+            $.ajax({
+                type: "POST",
+                url: '/api/signin',
+                data: {
+                    nickname: $('#nickname').val(),
+                    password: $('#password1').val(),
+                },
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        alert("회원가입이 완료되었습니다.");
+                        window.location.href = "/login.html"
+                    } else {
+                        alert("이미 존재하는 닉네임입니다.")
+                    }
+                }
+              });
+        } 
+    }
+</script>    
+
+</head>
+<body>
+    <section class="hero is-info">
+        <div class="hero-body">
+          <p class="title">
+            5기 a반 회원가입
+          </p>
+          <p class="subtitle">
+            날래날래 하라우
+          </p>
+        </div>
+      </section>
+
+    <div class="posting">   
+    <div class="field">
+        <label class="label">닉네임 <br><span style='font-size:small; color:darkgray'>최소 3자 이상, 알파벳 대소문자(a~z, A~Z), 숫자(0~9)</span></label>
+        <div class="control">
+          <input id="nickname" class="input" type="text" placeholder="닉네임을 입력하세요">
+        </div>
+      </div>
+      
+      <div class="field">
+        <label class="label">비밀번호<br><span style='font-size:small; color:darkgray'>최소 4자 이상, 아이디값 포함 X</span></label>
+        <div class="control">
+            <input id="password1" class="input" type="password" placeholder="비밀번호를 입력하세요">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">비밀번호 확인</label>
+        <div class="control">
+          <input id="password2" class="input" type="password" placeholder="비밀번호를 한번 더 입력하세요">
+        </div>
+      </div>
+
+      <div class="field is-grouped">
+        <div class="control">
+          <button onclick='signin()' class="button is-link">회원가입완료</button>
+        </div>
+        <div class="control">
+          <button onclick="location.href ='/login.html'" class="button is-link is-light">취소</button>
+        </div>
+      </div>
+    </div>
+</body>
+</html>

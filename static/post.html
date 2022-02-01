@@ -36,15 +36,15 @@
 </style>
 <script>
     function addPost() {
-      if (($('#name').val() != "") && ($('#password').val() != "") &&
-            ($('#title').val() != "") && ($('#comment').val() != "")) {
+      if (($('#title').val() != "") && ($('#comment').val() != "")) {
             let tempDate = new Date()
             $.ajax({
                 type: "POST",
                 url: '/api/articles',
+                headers: {
+                  authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
                 data: {
-                    name: $('#name').val(),
-                    password: $('#password').val(),
                     title: $('#title').val(),
                     comment: $('#comment').val(),
                     date: tempDate.getFullYear() + '.' + (tempDate.getMonth() + 1) + '.' + tempDate.getDate()

@@ -23,20 +23,24 @@
 
 
     <style>
-        .hero {
-            margin-bottom: 50px;
-        }
-        .hero-body {
-        text-align: center;
+      .hero {
+          margin-bottom: 50px;
+       }
+      .hero-body {
+          text-align: center;
       }
       .table {
           width:800px;
           margin:auto;
       }
+      /* .clickbox {
+          display: inline-block;
+      } */
     </style>
     <script>
         $(document).ready(function() {
             showarticles();
+            changeButton();
         });
         
         function showarticles() {
@@ -63,6 +67,19 @@
                     }
                 })
             }
+
+        function changeButton () {
+            if (localStorage.getItem("token")) {
+            $('#goLogin').hide()
+            $('#goPost').show()
+            $('#logOut').show()
+        };
+        return;
+        }
+        function logOut() {
+            localStorage.clear();
+            window.location.href = "/";
+        }
     </script>
 
 </head>
@@ -75,7 +92,11 @@
           <p class="subtitle">
             홍 매니저님의 아이들
           </p>
-          <button onclick="location.href='/post.html'" style="height:50px; display: block; margin: auto;">게시물 작성하기</button>
+          <div class="clickbox">
+          <button id="goLogin" onclick="location.href='/login.html'" style="height:50px; display: block; margin: auto;">로그인 하기</button>
+          <button id="goPost" onclick="location.href='/post.html'" style="height:50px; display: none; margin: auto;">게시물 작성하기</button>
+          <button id="logOut" onclick="logOut()" style="height:50px; display: none; margin: auto;">로그아웃</button>   
+          </div>
         </div>
       </section>
       
