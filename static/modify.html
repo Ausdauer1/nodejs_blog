@@ -36,10 +36,31 @@
 </style>
 <script>
      $(document).ready(function() {
-        
+        checkAuth();
         showdetail();
         });
-
+    function checkAuth () {
+      const para = document.location.href.split("=")[1]
+          
+          $.ajax({
+              type: "GET",
+              url: "/api/articles/"+para+"/check",
+              headers: {
+                  authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              data: {},
+              success: function (response) {
+                if (response["result"] === "fail") {
+                  alert("해당페이지의 접근권한이 없습니다")
+                  window.location.replace("/index.html");
+                }
+              },
+              error: function (error) {
+                alert(error.responseJSON.errorMessage);
+                window.location.replace("/index.html");
+              },
+            });
+    }
     function showdetail() {
           const para = document.location.href.split("=")[1]
           
@@ -51,30 +72,28 @@
                         let article = response['articles']
                       
                             let title = article['title']
-                            let name = article['name']
                             let comment = article['comment']
 
                 
                             $('#title').val(title)
-                            $('#comment').val(comment)
-                            $('#name').val(name)
+                            $('#comment').val(comment)      
                         }
                     })
                 }
 
 
     function modifyPost() {
-      if (($('#name').val() != "") && ($('#password').val() != "") &&
-            ($('#title').val() != "") && ($('#comment').val() != "")) {
+      if (($('#title').val() != "") && ($('#comment').val() != "")) {
             let tempDate = new Date()
             const para = document.location.href.split("=")[1]
             
             $.ajax({
                 type: "PUT",
                 url: '/api/articles/'+para+'/update',
+                headers: {
+                  authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
                 data: {
-                    name: $('#name').val(),
-                    password: $('#password').val(),
                     title: $('#title').val(),
                     comment: $('#comment').val(),
                     date: tempDate.getFullYear() + '.' + (tempDate.getMonth() + 1) + '.' + tempDate.getDate()
@@ -82,12 +101,10 @@
             
                 },
                 success: function (response) {
-                    if (response["result"] == "success") {
+                    if (response["result"] === "success") {
                         alert("수정되었습니다.");
                         window.location.href = "/index.html"
-                    } else {
-                        alert("비밀번호가 틀렸습니다!")
-                    }
+                    } 
                 }
               });
         } else {
@@ -97,21 +114,20 @@
 
     function deletePost() {
         const para = document.location.href.split("=")[1]
-        const postpassword = $('#password').val()
         $.ajax({
                     type:"DELETE",
                     url:'/api/articles/'+para+'/delete',
-                    data: { password: postpassword},
+                    headers: {
+                        authorization: `Bearer ${localStorage.getItem("token")}`,
+                      },
+                    data: {},
                     success: function (response) {
-                        if (response["result"] == "success") {
+                        if (response["result"] === "success") {
                         alert("삭제되었습니다.");
                         window.location.href = "/index.html"
-                    } else {
-                        alert("비밀번호가 틀렸습니다!")
+                    } 
                     }
-                      
-                    }
-              })
+              });
     }
 </script>
 </head>
@@ -134,21 +150,7 @@
           <input id="title" class="input" type="text" value="">
         </div>
       </div>
-      
-      <div class="field">
-        <label class="label">이름</label>
-        <div class="control">
-          <input id="name" class="input" type="text" value="">
-        </div>
-      </div>
-
-      <div class="field">
-        <label class="label">비밀번호</label>
-        <div class="control">
-          <input id="password" class="input" type="password" value="">
-        </div>
-      </div>
-      
+ 
       <div class="field">
         <label class="label">내용</label>
         <div class="control">

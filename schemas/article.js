@@ -8,11 +8,7 @@ const articleSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
-    name: {
-        type:String,
-        require: true,
-    },
-    password: {
+    nickname: {
         type:String,
         require: true,
     },

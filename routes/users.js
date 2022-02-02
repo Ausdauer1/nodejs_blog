@@ -26,7 +26,7 @@ router.post("/auth", async (req,res) => {
 
     const user = await Users.findOne({nickname, password}).exec();
     if (!user) {
-        res.status(401).send({
+        res.status(400).send({
             errorMessage: '이메일 또는 패스워드가 잘못되었습니다.'
         });
         return;

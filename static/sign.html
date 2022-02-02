@@ -35,7 +35,12 @@
       
 </style>
 <script>
-
+    $(document).ready(function() {
+      if (localStorage.getItem("token")) {
+          alert("이미 로그인이 되어있습니다. 메인 페이지로 이동합니다.");
+          window.location.replace("/index.html");
+    }
+    });
     function signin() {
         let nicknameForm = /^[A-Za-z0-9+]{3,}$/;
         let nick = $('#nickname').val()

@@ -35,6 +35,12 @@
       
 </style>
 <script>
+    $(document).ready(function() {
+      if (!localStorage.getItem("token")) {
+          alert("로그인이 필요한 서비스입니다. 로그인 페이지로 이동합니다.");
+          window.location.replace("/login.html");
+    }
+    });
     function addPost() {
       if (($('#title').val() != "") && ($('#comment').val() != "")) {
             let tempDate = new Date()
@@ -52,11 +58,15 @@
             
                 },
                 success: function (response) {
-                    if (response["result"] == "success") {
-                        alert("저장되었습니다.");
-                        window.location.href = "/index.html"
-                    }
-                }
+                  if (response["result"] == "success") {
+                      alert("저장되었습니다.");
+                      window.location.href = "/index.html"
+                  } 
+                },
+                error: function (error) {
+                  alert(error.responseJSON.errorMessage);
+                  window.location.href = "/login.html"
+                },
               });
         } else {
             alert("입력칸을 모두 채워주세요.");
@@ -82,20 +92,6 @@
         <label class="label">제목</label>
         <div class="control">
           <input id="title" class="input" type="text" placeholder="제목을 입력하세요">
-        </div>
-      </div>
-      
-      <div class="field">
-        <label class="label">이름</label>
-        <div class="control">
-          <input id="name" class="input" type="text" placeholder="이름을 입력하세요">
-        </div>
-      </div>
-
-      <div class="field">
-        <label class="label">비밀번호</label>
-        <div class="control">
-          <input id="password" class="input" type="password" placeholder="비밀번호를 입력하세요">
         </div>
       </div>
       

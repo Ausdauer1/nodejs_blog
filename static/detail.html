@@ -11,6 +11,9 @@
 
     <!-- Bulma CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
     <!-- Google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,32 +23,37 @@
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
-
+    <script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
 
 <style>
     .card{
-        width: 70%;
-        margin: 80px auto auto auto;
-        
+        width: 600px;
+        margin: 30px auto auto auto;       
     }
-    .card-content {
-      text-align: center;
+    .table {
+      width : 600px;
+      margin: 30px auto auto auto;
     }
       
     .hero-body {
     text-align: center;
   }
+  .input-group{
+    width: 600px;
+    margin: 20px auto auto auto;
+  }
 </style>
     <script>
       $(document).ready(function() {
-        
+        showcomments();
         showdetail();
+        showbutton();
         });
 
         
         function showdetail() {
           const para = document.location.href.split("=")[1]
-          console.log(para)
+          
                 $.ajax({
                     type: "GET",
                     url: "/api/articles/"+para,
@@ -54,23 +62,199 @@
                         let article = response['articles']
                       
                             let title = article['title']
-                            let name = article['name']
+                            let name = article['nickname']
                             let time = article['date']
                             let comment = article['comment']
 
                 
                             $('#title').append("제목 : "+title)
-                            $('#comment').append("내용 : "+comment)
-                            $('#name').append("작성자 : "+name)
+                            $('#comment').append("  "+comment)
+                            $('#name').append("닉네임 : "+name)
                             $('#time').append("작성/수정 시간 : "+time)
                         }
                     })
                 }
-            
-        function modify() {
+        function showbutton() {
+          const para = document.location.href.split("=")[1]
+          
+          $.ajax({
+              type: "GET",
+              url: "/api/articles/"+para+"/check",
+              headers: {
+                  authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              data: {},
+              success: function (response) {
+                if (response["result"] == "success") {
+                  $('#modify').show() 
+                }
+              }
+            });
+        };
+
+        function goModify() {
           const para = document.location.href.split("=")[1]
           location.href='/modify.html?articleId='+para
         }
+
+        function showcomments() {
+          const para = document.location.href.split("=")[1]
+          if (!localStorage.getItem("token")) {
+            $.ajax({
+                    type: "GET",
+                    url: "/api/articles/"+para+"/comment",
+                    data: {},
+                    success: function (response) {
+                        let comments = response['existcomments']
+                        comments.sort((a, b) => Number(b.id2) - Number(a.id2))
+                        for (let i = 0; i < comments.length; i++) {
+                            let nickname = comments[i]['nickname']
+                            let comment = comments[i]['comment']
+                            let id = comments[i]['id2']
+                            let temp_html = `<tr>
+                                                <td>${nickname}</td>
+                                                <td>${comment}</td>
+                                                <td >
+                                                  <button style="display:none;">저장</button>
+                                                </td>
+                                             </tr> `
+                            $('#comments-box').append(temp_html)
+                        }
+                    }
+                })
+            } else {
+              $.ajax({
+                    type: "GET",
+                    url: "/api/articles/"+para+"/commentb",
+                    data: {},
+                    headers: {
+                        authorization: `Bearer ${localStorage.getItem("token")}`,
+                        },
+                    success: function (response) {
+                        let comments = response['existcomments']
+                        let nick = response['nick']
+                        console.log(comments)
+                        console.log(nick)
+                        comments.sort((a, b) => Number(b.id2) - Number(a.id2))
+                        for (let i = 0; i < comments.length; i++) {
+                            let nickname = comments[i]['nickname']
+                            let comment = comments[i]['comment']
+                            let id = comments[i]['id2']
+                            let temp_html = `<tr>
+                                                <td>${nickname}</td>
+                                                <td>${comment}</td>
+                                                <td ></td>
+                                             </tr> `
+                            let temp_html2 = `<tr>
+                                                <td>${nickname}</td>
+                                                <td><p id="c${id}" >${comment}</p>
+                                                  <input id="i${id}"  type="text" class="form-control" value="${comment}"  style="display:none" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                  </td>
+                                                <td >
+                                                  <i id="ic1${id}" onclick="modify(${id})" class="fas fa-edit"></i>
+                                                  <i id="ic2${id}" onclick="deletecom(${id})" class="fas fa-trash-alt"></i>
+                                                  <button onclick="modifyconfirm(${id})" id=b${id} style="display:none;">저장</button>
+                                                </td>
+                                             </tr> `                 
+                            if (nickname == nick) {
+                           $('#comments-box').append(temp_html2)
+                            } else {
+                              $('#comments-box').append(temp_html)
+                            }
+                        }
+                    }
+                })
+            }
+          }            
+                   
+            function cursor() {
+              if (!localStorage.getItem("token")) {
+               alert("로그인이 필요한 서비스입니다. 로그인 페이지로 이동합니다.");
+              window.location.replace("/login.html");
+                }
+            }
+
+            function postcomment() {
+              if ($('#commentval').val() != "") {
+              const para = document.location.href.split("=")[1]
+              $.ajax({
+                type: "POST",
+                url: "/api/articles/"+para+"/comment",
+                headers: {
+                  authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+                data: {
+                    comment: $('#commentval').val()
+                },
+                success: function (response) {
+                  if (response["result"] == "success") {
+                      alert("댓글이 등록되었습니다.");
+                      window.location.reload();
+                  } 
+                },
+                error: function (error) {
+                  alert(error.responseJSON.errorMessage);
+                  window.location.href = "/login.html"
+                },
+              });
+            } else {
+              alert("입력칸을 채워주세요!");
+            }
+            }
+
+            function modify(id2) {
+              $('#c'+id2).hide();
+              $('#ic1'+id2).hide();
+              $('#ic2'+id2).hide();
+              $('#i'+id2).show();
+              $('#b'+id2).show();
+            }
+
+            function modifyconfirm(id2) {
+              if ($('#i'+id2).val() != "") {
+              const para = document.location.href.split("=")[1]
+              $.ajax({
+                type: "PUT",
+                url: '/api/articles/'+para+'/update/'+id2,
+                headers: {
+                  authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+                data: {
+                  comment : $('#i'+id2).val()
+                },
+                success: function (response) {
+                    if (response["result"] === "success") {
+                        alert("수정되었습니다.");
+                        window.location.reload();
+                    } 
+                }
+              });
+            } else {
+                alert("입력란을 채워주세요!");
+            }
+            }
+
+            function deletecom(id2) {
+              const para = document.location.href.split("=")[1]
+              if (confirm("정말 삭제하시겠습니까??") == true){    //확인
+                // document.form.submit();
+                    $.ajax({
+                    type:"DELETE",
+                    url:"/api/articles/"+para+"/"+id2,
+                    headers: {
+                        authorization: `Bearer ${localStorage.getItem("token")}`,
+                      },
+                    data: {},
+                    success: function (response) {
+                        if (response["result"] === "success") {
+                        alert("삭제되었습니다.");
+                        window.location.reload();
+                    } 
+                    }
+              });
+              }else{   //취소
+                return;}
+            }
     </script>
 
 </head>
@@ -88,22 +272,35 @@
       </section>
     <div class="card">
         <div class="card-content">
-          <p class="title" id="title">
-           
-          </p>
-            <p class="text" style="font-size: 30px;" id="comment">
-            
-          </p>
-          <p class="name" style="font-size: 20px; margin-top: 20px;"  id="name">
-            
+          <p class="title" id="title"></p> <p class="name" style="font-size: 20px; margin-top: 20px;" id="name"></p>
+            <br>내용
+            <p class="text" style="font-size: 30px; width: 500px; height: 150px; background-color: wheat;"  id="comment">
             </p>
-            <br>
-            <p class="uploadtime" style="color:blueviolet; font-weight: bold;" id="time">
-              
+            <p class="uploadtime" style="color:#3298dc; font-weight: bold;" id="time">
               </p>
               <br>
-              <button onclick="modify()" style="width: 120px; height:50px">게시글 수정</button>
+              <button id="modify" onclick="goModify()" style="width: 150px; height:50px; display: none;">게시글 수정/ 삭제</button>
         </div>
-        </div>
+    </div>
+    <p style="margin: 30px auto auto auto; font-size: 30px; color: white; text-align: center; width:600px;background-color: #3298dc;">댓글 리스트</p>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">닉네임</th>
+              <th scope="col">내용</th>
+          </tr>
+          </thead>
+          <tbody id="comments-box">
+      
+          </tbody>
+          </table>
+          
+          <div class="input-group mb-3">
+            <label class="input-group-text" for="inputGroupSelect01">댓글</label>
+            <input id="commentval" onclick="cursor()" type="text" class="form-control" placeholder="댓글 입력" aria-label="Recipient's username" aria-describedby="basic-addon2">
+            <div class="input-group-append">
+              <button onclick="postcomment()" class="btn btn-outline-secondary" type="button" >완료</button>
+            </div>
+          </div>
 </body>
 </html>
